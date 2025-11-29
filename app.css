@@ -1,0 +1,7 @@
+.footer {
+  width: 90%; /* cùng chiều rộng với container */
+  margin: 40px auto 20px auto; /* cách trên 40px, cách dưới 20px */
+  text-align: right; /* căn sang phải */
+  color: #555;
+  font-size: 14px;
+}
