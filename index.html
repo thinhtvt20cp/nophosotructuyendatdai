@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hệ thống thủ tục hành chính đất đai</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#0d47a1,#1976d2,#42a5f5);
+    overflow-y:auto;   /* Cho phép cuộn dọc */
+    overflow-x:hidden;
+    display:flex;
+    flex-direction:column;
+}
+
+.header{
+    text-align:center;
+    padding:25px 10px;
+    color:white;
+    background:rgba(0,0,0,0.15);
+}
+
+.header h1{
+    font-size:30px;
+    letter-spacing:1px;
+}
+
+.search-container{
+    text-align:center;
+    padding:15px;
+    background:rgba(255,255,255,0.1);
+}
+
+.search-container input{
+    width:40%;
+    padding:12px;
+    border-radius:25px;
+    border:none;
+    outline:none;
+    font-size:16px;
+}
+
+.container{
+    flex:1;
+    padding:30px 60px;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:30px;
+    align-content:start;   /* Không ép giữa nữa */
+
+}
+
+.card{
+    background:white;
+    border-radius:14px;
+    padding:18px;
+    text-align:center;
+    box-shadow:0 8px 25px rgba(0,0,0,0.25);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    align-items:center;
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:scale(1.05);
+}
+
+.card h3{
+    color:#0d47a1;
+    font-size:15px;
+    min-height:40px;
+}
+
+.card img{
+    width:150px;
+    height:150px;
+    object-fit:contain;
+    margin:10px 0;
+}
+
+.card a{
+    padding:8px 18px;
+    background:#0d47a1;
+    color:white;
+    text-decoration:none;
+    border-radius:20px;
+    font-size:14px;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.card a:hover{
+    background:#1976d2;
+}
+
+.footer{
+    text-align:center;
+    padding:10px;
+    color:white;
+    background:rgba(0,0,0,0.2);
+    font-size:14px;
+}
+
+@media(max-width:1200px){
+    .container{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:800px){
+    .container{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>QR THỦ TỤC HÀNH CHÍNH ĐẤT ĐAI</h1>
+</div>
+
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="🔎 Tìm kiếm thủ tục..." onkeyup="searchFunction()">
+</div>
+
+<div class="container">
+
+<!-- 1 → 10 giữ nguyên -->
+<script>
+const procedures = [
+{
+    name: "Chuyển nhượng, Tặng cho, Thừa kế QSDĐ",
+    link: "https://dichvucong.gov.vn/p/home/dvc-danh-sach-dich-vu-cong.html?tu_khoa=&bo_nganh=&tinh_thanh=T%E1%BB%89nh%20C%C3%A0%20Mau&so=&quan_huyen=X%C3%A3%20Tr%E1%BA%A7n%20V%C4%83n%20Th%E1%BB%9Di&phuong_xa=&ma_tt=1.013831&id_tinh_thanh=13466&id_quan_huyen=22975&id_phuong_xa=undefined&id_so=474214&id_bo_nganh=-1",
+    qr: "images/qr1.png"
+},
+{
+    name: "Cấp đổi giấy chứng nhận QSĐ",
+    link: "https://dichvucong.gov.vn/p/home/dvc-danh-sach-dich-vu-cong.html?tu_khoa=&bo_nganh=&tinh_thanh=T%E1%BB%89nh%20C%C3%A0%20Mau&so=&quan_huyen=X%C3%A3%20Tr%E1%BA%A7n%20V%C4%83n%20Th%E1%BB%9Di&phuong_xa=&ma_tt=1.012783&id_tinh_thanh=13466&id_quan_huyen=22975&id_phuong_xa=undefined&id_so=null&id_bo_nganh=-1",
+    qr: "images/qr2.png"
+},
+{
+    name: "Thay đổi thông tin người sử dụng QSĐ (4 ngày)",
+    link: "https://dichvucong.gov.vn/p/home/dvc-danh-sach-dich-vu-cong.html?tu_khoa=&bo_nganh=&tinh_thanh=T%E1%BB%89nh%20C%C3%A0%20Mau&so=&quan_huyen=X%C3%A3%20Tr%E1%BA%A7n%20V%C4%83n%20Th%E1%BB%9Di&phuong_xa=&ma_tt=1.013833&id_tinh_thanh=13466&id_quan_huyen=22975&id_phuong_xa=undefined&id_so=474214&id_bo_nganh=-1#tthcName",
+    qr: "images/qr3.png"
+},
+{
+    name: "Đăng ký thế chấp",
+    link: "https://dichvucong.gov.vn/p/home/dvc-danh-sach-dich-vu-cong.html?tu_khoa=&bo_nganh=&tinh_thanh=T%E1%BB%89nh%20C%C3%A0%20Mau&so=&quan_huyen=X%C3%A3%20Tr%E1%BA%A7n%20V%C4%83n%20Th%E1%BB%9Di&phuong_xa=&ma_tt=1.011441&id_tinh_thanh=13466&id_quan_huyen=22975&id_phuong_xa=undefined&id_so=null&id_bo_nganh=-1#tthcName",
+    qr: "images/qr4.png"
+},
+{
+    name: "Xóa đăng ký thế chấp",
+    link: "https://dichvucong.gov.vn/p/home/dvc-danh-sach-dich-vu-cong.html?tu_khoa=&bo_nganh=&tinh_thanh=T%E1%BB%89nh%20C%C3%A0%20Mau&so=&quan_huyen=X%C3%A3%20Tr%E1%BA%A7n%20V%C4%83n%20Th%E1%BB%9Di&phuong_xa=&ma_tt=1.011443&id_tinh_thanh=13466&id_quan_huyen=22975&id_phuong_xa=undefined&id_so=null&id_bo_nganh=-1#tthcName",
+    qr: "images/qr5.png"
+},
+{
+    name: "Cung cấp thông tin, dữ liệu đất đai (Sao lục)",
+    link: "https://dichvucong.gov.vn/p/home/dvc-danh-sach-dich-vu-cong.html?tu_khoa=&bo_nganh=&tinh_thanh=T%E1%BB%89nh%20C%C3%A0%20Mau&so=&quan_huyen=X%C3%A3%20Tr%E1%BA%A7n%20V%C4%83n%20Th%E1%BB%9Di&phuong_xa=&ma_tt=1.012789&id_tinh_thanh=13466&id_quan_huyen=22975&id_phuong_xa=undefined&id_so=null&id_bo_nganh=-1#tthcName",
+    qr: "images/qr6.png"
+},
+{
+    name: "Cấp lại Giấy chứng nhận do bị mất",
+    link: "https://dichvucong.gov.vn/p/home/dvc-danh-sach-dich-vu-cong.html?tu_khoa=&bo_nganh=&tinh_thanh=T%E1%BB%89nh%20C%C3%A0%20Mau&so=&quan_huyen=X%C3%A3%20Tr%E1%BA%A7n%20V%C4%83n%20Th%E1%BB%9Di&phuong_xa=&ma_tt=1.012786&id_tinh_thanh=13466&id_quan_huyen=22975&id_phuong_xa=undefined&id_so=null&id_bo_nganh=-1#tthcName",
+    qr: "images/qr7.png"
+},
+{
+    name: "CN,TK,TC (Theo bản án)(8 ngày)",
+    link: "https://dichvucong.gov.vn/p/home/dvc-danh-sach-dich-vu-cong.html?tu_khoa=&bo_nganh=&tinh_thanh=T%E1%BB%89nh%20C%C3%A0%20Mau&so=V%C4%83n%20ph%C3%B2ng%20%C4%90%C4%83ng%20k%C3%BD%20%C4%91%E1%BA%A5t%20%C4%91ai%20t%E1%BB%89nh&quan_huyen=&phuong_xa=&ma_tt=1.013980&id_tinh_thanh=13466&id_quan_huyen=-1&id_phuong_xa=undefined&id_so=473789&id_bo_nganh=-1#tthcName",
+    qr: "images/qr8.png"
+},
+
+{
+    name: "Gia hạn QSDĐ",
+    link: "https://dichvucong.gov.vn/p/home/dvc-danh-sach-dich-vu-cong.html?tu_khoa=&bo_nganh=&tinh_thanh=T%E1%BB%89nh%20C%C3%A0%20Mau&so=&quan_huyen=X%C3%A3%20Tr%E1%BA%A7n%20V%C4%83n%20Th%E1%BB%9Di&phuong_xa=&ma_tt=1.013947&id_tinh_thanh=13466&id_quan_huyen=22975&id_phuong_xa=undefined&id_so=474266&id_bo_nganh=-1#tthcName",
+    qr: "images/qr9.png"
+},
+{
+    name: "Đính chính Giấy chứng nhận đã cấp",
+    link: "https://dichvucong.gov.vn/p/home/dvc-danh-sach-dich-vu-cong.html?tu_khoa=&bo_nganh=&tinh_thanh=T%E1%BB%89nh%20C%C3%A0%20Mau&so=&quan_huyen=X%C3%A3%20Tr%E1%BA%A7n%20V%C4%83n%20Th%E1%BB%9Di&phuong_xa=&ma_tt=1.012790&id_tinh_thanh=13466&id_quan_huyen=22975&id_phuong_xa=undefined&id_so=null&id_bo_nganh=-1#tthcName",
+    qr: "images/qr10.png"
+},
+{
+    name: "Đấu giá",
+    link: "https://dichvucong.gov.vn/p/home/dvc-danh-sach-dich-vu-cong.html?tu_khoa=&bo_nganh=&tinh_thanh=T%E1%BB%89nh%20C%C3%A0%20Mau&so=V%C4%83n%20ph%C3%B2ng%20%C4%90%C4%83ng%20k%C3%BD%20%C4%91%E1%BA%A5t%20%C4%91ai%20t%E1%BB%89nh&quan_huyen=&phuong_xa=&ma_tt=1.013980&id_tinh_thanh=13466&id_quan_huyen=-1&id_phuong_xa=undefined&id_so=473789&id_bo_nganh=-1#tthcName#tthcName",
+    qr: "images/qr11.png"
+},
+
+];
+
+document.querySelector(".container").innerHTML =
+procedures.map(p => `
+<div class="card">
+    <h3>${p.name}</h3>
+    <img src="${p.qr}" alt="QR ${p.name}">
+    <a href="${p.link}" target="_blank">Xem chi tiết</a>
+</div>
+`).join('');
+</script>
+
+</div>
+
+<div class="footer">
+© 2026 Hệ thống hành chính đất đai
+</div>
+
+<script>
+function searchFunction(){
+    let input=document.getElementById("searchInput");
+    let filter=input.value.toLowerCase();
+    let cards=document.getElementsByClassName("card");
+
+    for(let i=0;i<cards.length;i++){
+        let title=cards[i].getElementsByTagName("h3")[0];
+        if(title.innerText.toLowerCase().includes(filter)){
+            cards[i].style.display="flex";
+        }else{
+            cards[i].style.display="none";
+        }
+    }
+}
+</script>
+
+</body>
+</html>
